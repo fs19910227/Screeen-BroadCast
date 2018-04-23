@@ -1,60 +1,62 @@
 package com.fs.frame.server;
 
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+import com.fs.frame.beans.ImageFrame;
+
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+
 
 public class TCPClient {
+    CVCapture capture = (CVCapture) CaptureFactory.get().getCapture(CVCapture.class);
     String host;
     int port;
-    Capture capture = Capture.getCapture();
     int delay;
+    SocketChannel channel = SocketChannel.open();
 
-    public TCPClient(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
-
-    public TCPClient(String host, int port, int delay) {
+    public TCPClient(String host, int port, int delay) throws IOException {
         this.host = host;
         this.port = port;
         this.delay = delay;
+        channel.connect(new InetSocketAddress(host, port));
     }
 
-    public void catchAndSend() throws IOException {
-        BufferedImage image = capture.captureScreen();
-        Socket socket = new Socket(host, port);
-        OutputStream outputStream = socket.getOutputStream();
-        ImageIO.write(image, "jpg", outputStream);
-        socket.close();
+
+    public void newCatchAndSend() throws IOException {
+
+        long start = System.currentTimeMillis();
+        ImageFrame imageFrame = capture.captureFrame();
+        ByteBuffer headBuffer = imageFrame.headBuffer();
+        ByteBuffer dataBuffer = imageFrame.dataBuffer();
+        channel.write(headBuffer);
+        channel.write(dataBuffer);
+        imageFrame.clear();
+        long costTime = System.currentTimeMillis() - start;
+        System.out.printf("grab and send cost time=%sms\r\n", costTime);
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        Integer port = Integer.valueOf(args[1]);
-        String host = String.valueOf(args[0]);
-        int delay=Integer.valueOf(args[2]);
-        TCPClient tcpClient = new TCPClient(host, port,delay);
-        while (true) {
-            tcpClient.catchAndSend();
-            Thread.sleep(900);
-        }
+
+    public static void main(String[] args) throws IOException {
+        TCPClient tcpClient = new TCPClient("localhost", 8888, 0);
+        tcpClient.newCatchAndSend();
 
     }
 
     public void start() {
         while (true) {
             try {
-                long start=System.currentTimeMillis();
-                this.catchAndSend();
-                long end=System.currentTimeMillis()-start;
-                System.out.println("cost time:"+end+"ms");
+                long start = System.currentTimeMillis();
+                this.newCatchAndSend();
+                long costTime = System.currentTimeMillis() - start;
+                System.out.printf("grab and send cost time=%sms\r\n", costTime);
                 Thread.sleep(delay);
-            } catch (Exception  e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
+
 }

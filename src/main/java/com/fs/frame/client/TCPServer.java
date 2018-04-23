@@ -1,6 +1,8 @@
 package com.fs.frame.client;
 
-import com.fs.frame.server.Capture;
+
+import com.fs.frame.beans.ImageFrame;
+import org.bytedeco.javacv.Java2DFrameConverter;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -8,38 +10,48 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+
 
 public class TCPServer {
     public ClientFrame ui;
-    public ServerSocket serverSocket;
-
-    public TCPServer(int port) throws IOException {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                Capture capture = Capture.getCapture();
-                Rectangle screenRectangle = capture.getScreenRectangle();
-                int width = screenRectangle.width;
-                ui=new ClientFrame(width, (int) (width * 0.618));
-            } catch (AWTException e) {
-                e.printStackTrace();
-            }
-        });
-        serverSocket = new ServerSocket(port);
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    Java2DFrameConverter converter = new Java2DFrameConverter();
+    int port;
+    public TCPServer() {
     }
-    public void run() throws IOException {
+    public TCPServer init(int port,int width,int height) throws IOException {
+        this.port=port;
+        SwingUtilities.invokeLater(() -> {
+            ui=new ClientFrame("Capture Screen",width, height);
+        });
+        return this;
+    }
+    public TCPServer init(int port) throws IOException {
+        init(port,screenSize.width,screenSize.height);
+        return this;
+    }
+
+    public void newStart() throws IOException {
+        ServerSocketChannel channel = ServerSocketChannel.open();
+        channel.bind(new InetSocketAddress(port));
+        ImageFrame imageFrame = new ImageFrame();
+        SocketChannel accept = channel.accept();
         while (true){
-            Socket accept = serverSocket.accept();
-            InputStream inputStream = accept.getInputStream();
-            BufferedImage image = ImageIO.read(inputStream);
-            accept.close();
+            imageFrame.readData(accept);
+            BufferedImage image = converter.convert(imageFrame);
             ui.processImageEvent(image);
+            imageFrame.clear();
+            System.out.println("process one");
         }
+
     }
     public static void main(String[] args) throws IOException {
-        Integer port = Integer.valueOf(args[0]);
-        TCPServer tcpServer = new TCPServer(port);
-        tcpServer.run();
+        TCPServer tcpServer = new TCPServer().init(8888);
+        tcpServer.newStart();
     }
 }
