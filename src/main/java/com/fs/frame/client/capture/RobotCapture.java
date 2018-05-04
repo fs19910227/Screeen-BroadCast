@@ -1,4 +1,4 @@
-package com.fs.frame.server;
+package com.fs.frame.client.capture;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

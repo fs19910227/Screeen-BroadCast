@@ -1,4 +1,4 @@
-package com.fs.frame.client;
+package com.fs.frame.server.ui;
 
 import java.awt.image.BufferedImage;
 

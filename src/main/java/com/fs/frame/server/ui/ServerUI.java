@@ -1,20 +1,15 @@
-package com.fs.frame.client;
-
-import org.bytedeco.javacv.CanvasFrame;
-import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.Java2DFrameConverter;
+package com.fs.frame.server.ui;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
 
 /**
  *
  * client receive remote screen image message
  *
  */
-public class ClientFrame extends JFrame implements ImageOberser {
+public class ServerUI extends JFrame implements ImageOberser {
     MyPanel panel= new MyPanel();
 
 
@@ -39,7 +34,7 @@ public class ClientFrame extends JFrame implements ImageOberser {
 
     }
 
-    public ClientFrame(String title,int width, int height) throws HeadlessException {
+    public ServerUI(String title, int width, int height) throws HeadlessException {
         super(title);
         this.setSize(width, height);
         this.setLocationRelativeTo(null);

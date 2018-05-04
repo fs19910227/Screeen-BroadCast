@@ -1,4 +1,4 @@
-package com.fs.frame.server;
+package com.fs.frame.client.capture;
 
 import com.fs.frame.beans.ImageFrame;
 import org.bytedeco.javacv.FFmpegFrameGrabber;

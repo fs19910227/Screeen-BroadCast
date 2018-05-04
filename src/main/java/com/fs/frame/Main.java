@@ -1,7 +1,7 @@
 package com.fs.frame;
 
-import com.fs.frame.client.TCPServer;
-import com.fs.frame.server.TCPClient;
+import com.fs.frame.server.TCPServer;
+import com.fs.frame.client.TCPClient;
 
 import java.io.IOException;
 
@@ -21,15 +21,15 @@ public class Main {
                 break;
             case "server":
                 port = Integer.valueOf(args[1]);
-                TCPServer tcpServer = new TCPServer();
+                TCPServer tcpServer = new TCPServer(port);
                 if(args.length>2){
                     int width = Integer.valueOf(args[2]);
                     int height= Integer.valueOf(args[3]);
-                    tcpServer.init(port,width,height);
+                    tcpServer.init(width,height);
                 }else {
-                    tcpServer.init(port);
+                    tcpServer.init();
                 }
-                tcpServer.newStart();
+                tcpServer.start();
                 break;
             default:
                 System.out.println("err");

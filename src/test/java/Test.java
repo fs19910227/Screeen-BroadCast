@@ -1,7 +1,6 @@
-import com.fs.frame.server.CVCapture;
-import com.fs.frame.server.Capture;
-import com.fs.frame.server.CaptureFactory;
-import com.fs.frame.server.RobotCapture;
+import com.fs.frame.client.capture.Capture;
+import com.fs.frame.client.capture.CaptureFactory;
+import com.fs.frame.client.capture.RobotCapture;
 import org.bytedeco.javacv.*;
 import org.bytedeco.javacv.Frame;
 import org.junit.After;
@@ -10,8 +9,6 @@ import org.junit.Before;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.ByteBuffer;
-
 
 
 public class Test {

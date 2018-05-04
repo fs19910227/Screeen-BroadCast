@@ -1,5 +1,6 @@
 package com.fs.frame.beans;
 
+import com.fs.frame.common.utills.BufferUtills;
 import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
@@ -9,11 +10,13 @@ import java.awt.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 
 public class ImageFrame extends Frame implements Serializable {
     public int imageCapacity;
     ByteBuffer headBuffer = ByteBuffer.allocate(12);
     ByteBuffer dataBuffer;
+
     public ImageFrame(Frame old) {
         this.imageWidth = old.imageWidth;
         this.imageHeight = old.imageHeight;
@@ -21,29 +24,25 @@ public class ImageFrame extends Frame implements Serializable {
         this.imageDepth = old.imageDepth;
         this.imageStride = old.imageStride;
         this.image = old.image;
-        this.imageCapacity=old.image[0].capacity();
+        this.imageCapacity = old.image[0].capacity();
     }
 
     public ImageFrame() {
     }
 
     public ImageFrame readData(SocketChannel channel) throws IOException {
-        channel.read(headBuffer);
-        headBuffer.flip();
-        this.imageWidth=headBuffer.getShort();
-        this.imageHeight=headBuffer.getShort();
-        this.imageChannels=headBuffer.get();
-        this.imageDepth=headBuffer.get();
-        this.imageStride=headBuffer.getShort();
-        this.imageCapacity=headBuffer.getInt();
-        if(this.dataBuffer==null){
-            dataBuffer=ByteBuffer.allocate(this.imageCapacity);
+        BufferUtills.fullRead(channel, headBuffer);
+        this.imageWidth = headBuffer.getShort();
+        this.imageHeight = headBuffer.getShort();
+        this.imageChannels = headBuffer.get();
+        this.imageDepth = headBuffer.get();
+        this.imageStride = headBuffer.getShort();
+        this.imageCapacity = headBuffer.getInt();
+        if (this.dataBuffer == null) {
+            dataBuffer = ByteBuffer.allocate(this.imageCapacity);
         }
-        while (dataBuffer.hasRemaining()) {
-            channel.read(dataBuffer);
-        }
-        dataBuffer.flip();
-        this.image=new ByteBuffer[]{dataBuffer};
+        BufferUtills.fullRead(channel, dataBuffer);
+        this.image = new ByteBuffer[]{dataBuffer};
         return this;
     }
 
@@ -64,74 +63,21 @@ public class ImageFrame extends Frame implements Serializable {
         return byteBuffer;
     }
 
-    public byte[] toBytes() throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ByteArrayOutputStream bufferOut = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-
-        headToBytes(outputStream, objectOutputStream);
-
-        ByteBuffer buffer = (ByteBuffer) this.image[0];
-
-        for (int i = 0; i < buffer.limit(); i++) {
-            byte b = buffer.get();
-            bufferOut.write(b);
-
-        }
-        buffer.clear();
-        objectOutputStream.writeObject(bufferOut.toByteArray());
-        return outputStream.toByteArray();
-    }
-
-    private byte[] headToBytes(ByteArrayOutputStream outputStream, ObjectOutputStream objectOutputStream) throws IOException {
-        objectOutputStream.writeObject(this.imageWidth);
-        objectOutputStream.writeObject(this.imageHeight);
-        objectOutputStream.writeObject(this.imageChannels);
-        objectOutputStream.writeObject(this.imageDepth);
-        objectOutputStream.writeObject(this.imageStride);
-        objectOutputStream.writeObject(this.imageCapacity);
-        return outputStream.toByteArray();
-    }
-
-    public ImageFrame(byte[] bytes) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
-        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-        this.imageWidth = (int) objectInputStream.readObject();
-        this.imageHeight = (int) objectInputStream.readObject();
-        this.imageChannels = (int) objectInputStream.readObject();
-        this.imageDepth = (int) objectInputStream.readObject();
-        this.imageStride = (int) objectInputStream.readObject();
-        this.imageCapacity=(int)objectInputStream.readObject();
-        byte[] buffer = (byte[]) objectInputStream.readObject();
-        ByteBuffer wrap = ByteBuffer.wrap(buffer);
-        this.image = new ByteBuffer[]{wrap};
-    }
-
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
-        CanvasFrame canvasFrame = new CanvasFrame("Screen RobotCapture");
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        FFmpegFrameGrabber grabber = new FFmpegFrameGrabber("");
-        grabber.setFormat("x11grab");
-        grabber.setImageWidth(screenSize.width);
-        grabber.setImageHeight(screenSize.height);
-        grabber.setImageMode(FrameGrabber.ImageMode.COLOR);
-//        grabber.grabImage();
-        grabber.start();
-        Frame frame = grabber.grabImage();
-        ImageFrame myFrame = new ImageFrame(frame);
-        System.out.println(myFrame.headBuffer());
-//        for (; ; ) {
-//            Frame frame = grabber.grabImage();
-//            ImageFrame myFrame = new ImageFrame(frame);
-//            byte[] x = myFrame.toBytes();
-//            ImageFrame x1 = new ImageFrame(x);
-//            System.out.println(x1);
-//            canvasFrame.showImage(x1);
-//        }
-    }
 
     public void clear() {
         headBuffer.clear();
         dataBuffer().clear();
+    }
+
+    @Override
+    public String toString() {
+        return "ImageFrame{" +
+                "imageWidth=" + imageWidth +
+                ", imageHeight=" + imageHeight +
+                ", imageDepth=" + imageDepth +
+                ", imageChannels=" + imageChannels +
+                ", imageStride=" + imageStride +
+                ", image=" + Arrays.toString(image) +
+                '}';
     }
 }

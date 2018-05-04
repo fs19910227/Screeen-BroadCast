@@ -1,4 +1,4 @@
-package com.fs.frame.server;
+package com.fs.frame.client.capture;
 
 public class CaptureFactory {
     private CaptureFactory(){}
