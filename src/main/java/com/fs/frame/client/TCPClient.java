@@ -15,8 +15,9 @@ import java.nio.channels.SocketChannel;
 public class TCPClient extends CommonClient {
     private CVCapture capture = (CVCapture) CaptureFactory.get().getCapture(CVCapture.class);
 
-    public TCPClient(String host, int port ) {
+    public TCPClient(String host, int port ) throws IOException {
         super(host, port);
+        super.init();
     }
 
     @Override

@@ -1,0 +1,1 @@
+java -jar broadcast-1.0-SNAPSHOT-jar-with-dependencies.jar server  12321  1024 768

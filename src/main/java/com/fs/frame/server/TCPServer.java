@@ -24,10 +24,8 @@ public class TCPServer extends CommonServer {
     protected void read(SocketChannel channel) throws IOException {
         try {
             imageFrame.readData(channel);
-            System.out.println("read one "+imageFrame);
             BufferedImage image = converter.convert(imageFrame);
             ui.processImageEvent(image);
-            System.out.println("process one");
         } catch (Exception exception) {
             exception.printStackTrace();
             System.out.println("client disconnect...");
