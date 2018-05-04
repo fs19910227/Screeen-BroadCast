@@ -62,9 +62,14 @@ public abstract class CommonClient {
     }
 
     protected void connect() throws IOException {
-        System.out.println("connection interrupt,close channel ...");
-        channel.close();
-        System.exit(1);
+        if(!channel.isConnected()){
+           channel.finishConnect();
+        }else {
+            System.out.println("connection interrupt,close channel ...");
+            channel.close();
+            System.exit(1);
+        }
+
     }
 
     private boolean tryConnect() throws IOException {

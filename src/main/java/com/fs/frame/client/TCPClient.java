@@ -38,7 +38,7 @@ public class TCPClient extends CommonClient {
     }
 
     public static void main(String[] args) throws IOException {
-        TCPClient tcpClient = new TCPClient("localhost", 8888).init();
+        TCPClient tcpClient = new TCPClient("192.168.11.236", 12321);
         tcpClient.start();
 
     }
