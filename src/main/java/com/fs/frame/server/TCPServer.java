@@ -14,10 +14,10 @@ import java.nio.channels.SocketChannel;
 
 
 public class TCPServer extends CommonServer {
-    public ServerUI ui;
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    Java2DFrameConverter converter = new Java2DFrameConverter();
-    ImageFrame imageFrame = new ImageFrame();
+    private ServerUI ui;
+    private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    private Java2DFrameConverter converter = new Java2DFrameConverter();
+    private ImageFrame imageFrame;
 
 
     @Override
@@ -39,13 +39,12 @@ public class TCPServer extends CommonServer {
 
     public TCPServer(int port) {
         super(port);
+        imageFrame = new ImageFrame();
     }
 
     public TCPServer init(int width, int height) throws IOException {
         super.init();
-        SwingUtilities.invokeLater(() -> {
-            ui = new ServerUI("Capture Screen", width, height);
-        });
+        SwingUtilities.invokeLater(() -> ui = new ServerUI("Capture Screen", width, height));
         return this;
     }
 

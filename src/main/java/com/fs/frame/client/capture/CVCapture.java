@@ -12,7 +12,7 @@ public class CVCapture implements Capture {
     private FFmpegFrameGrabber grabber;
     private Java2DFrameConverter converter = new Java2DFrameConverter();
     public CVCapture() throws FrameGrabber.Exception {
-        int x = 0, y = 0, w = 1024, h = 768;
+        int x = 0, y = 0;
         grabber = new FFmpegFrameGrabber(":0.0+" + x + "," + y);
         grabber.setFormat("x11grab");
         grabber.setImageWidth(screenSize.width);
@@ -23,8 +23,7 @@ public class CVCapture implements Capture {
     @Override
     public BufferedImage captureScreen2Image() throws FrameGrabber.Exception {
         Frame grab = grabber.grabImage();
-        BufferedImage bufferedImage = converter.getBufferedImage(grab);
-        return bufferedImage;
+        return converter.getBufferedImage(grab);
     }
     public ImageFrame captureFrame() throws FrameGrabber.Exception {
         Frame grab = grabber.grabImage();

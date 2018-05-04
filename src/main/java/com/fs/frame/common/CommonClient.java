@@ -6,7 +6,6 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
 import java.util.Set;
 
 public abstract class CommonClient {
@@ -14,25 +13,6 @@ public abstract class CommonClient {
     private int port;
     private SocketChannel channel;
     private Selector selector;
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public CommonClient() {
-    }
 
     public CommonClient(String host, int port) {
         this.host = host;
@@ -47,8 +27,10 @@ public abstract class CommonClient {
     }
 
     public void start() throws IOException {
-        while (!tryConnect()){
-
+        while (!tryConnect()) try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         runServer();
     }
@@ -68,9 +50,7 @@ public abstract class CommonClient {
     private void run() throws IOException {
         selector.select();
         Set<SelectionKey> selectionKeys = selector.selectedKeys();
-        Iterator<SelectionKey> iterator = selectionKeys.iterator();
-        while (iterator.hasNext()) {
-            SelectionKey next = iterator.next();
+        for (SelectionKey next : selectionKeys) {
             if (next.isConnectable()) {
                 System.out.println("process connect event");
                 connect();
@@ -96,15 +76,10 @@ public abstract class CommonClient {
             this.channel.configureBlocking(false);
             this.channel.register(selector, SelectionKey.OP_CONNECT | SelectionKey.OP_WRITE);
             this.channel.connect(new InetSocketAddress(host, port));
-            try{
+            try {
                 channel.finishConnect();
-            }catch (ConnectException e){
+            } catch (ConnectException e) {
                 System.out.println("try connect failed , seems thar server not open ...");
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
                 return false;
             }
         }

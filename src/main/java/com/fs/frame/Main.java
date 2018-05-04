@@ -6,7 +6,7 @@ import com.fs.frame.client.TCPClient;
 import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         String type = args[0];
         String host;
         Integer port;
@@ -14,9 +14,7 @@ public class Main {
             case "client":
                 host = String.valueOf(args[1]);
                 port = Integer.valueOf(args[2]);
-                int delay;
-                delay=Integer.valueOf(args[3]);
-                TCPClient tcpClient = new TCPClient(host, port,delay);
+                TCPClient tcpClient = new TCPClient(host, port);
                 tcpClient.start();
                 break;
             case "server":
@@ -32,7 +30,7 @@ public class Main {
                 tcpServer.start();
                 break;
             default:
-                System.out.println("err");
+                System.out.println("error use");
         }
 
     }

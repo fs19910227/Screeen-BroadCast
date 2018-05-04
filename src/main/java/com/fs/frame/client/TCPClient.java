@@ -14,11 +14,9 @@ import java.nio.channels.SocketChannel;
 
 public class TCPClient extends CommonClient {
     private CVCapture capture = (CVCapture) CaptureFactory.get().getCapture(CVCapture.class);
-    private int delay;
 
-    public TCPClient(String host, int port, int delay) throws IOException {
-        super(host,port);
-        this.delay = delay;
+    public TCPClient(String host, int port ) {
+        super(host, port);
     }
 
     @Override
@@ -38,8 +36,8 @@ public class TCPClient extends CommonClient {
 
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        TCPClient tcpClient = new TCPClient("localhost", 8888, 0).init();
+    public static void main(String[] args) throws IOException {
+        TCPClient tcpClient = new TCPClient("localhost", 8888).init();
         tcpClient.start();
 
     }

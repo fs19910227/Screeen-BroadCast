@@ -15,8 +15,7 @@ public final class RobotCapture implements Capture {
     @Override
     public BufferedImage captureScreen2Image() {
         final Rectangle rectangle = new Rectangle(0,0,1366,768);
-        BufferedImage image = robot.createScreenCapture(rectangle);
-        return image;
+        return robot.createScreenCapture(rectangle);
     }
 
 

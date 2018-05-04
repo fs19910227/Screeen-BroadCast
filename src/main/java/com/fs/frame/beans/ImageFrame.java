@@ -1,21 +1,21 @@
 package com.fs.frame.beans;
 
 import com.fs.frame.common.utills.BufferUtills;
-import org.bytedeco.javacv.CanvasFrame;
-import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.FrameGrabber;
 
-import java.awt.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
 public class ImageFrame extends Frame implements Serializable {
+    /**
+     *
+     */
     public int imageCapacity;
-    ByteBuffer headBuffer = ByteBuffer.allocate(12);
-    ByteBuffer dataBuffer;
+    private ByteBuffer headBuffer = ByteBuffer.allocate(12);
+    private ByteBuffer dataBuffer;
 
     public ImageFrame(Frame old) {
         this.imageWidth = old.imageWidth;
@@ -30,7 +30,7 @@ public class ImageFrame extends Frame implements Serializable {
     public ImageFrame() {
     }
 
-    public ImageFrame readData(SocketChannel channel) throws IOException {
+    public void readData(SocketChannel channel) throws IOException {
         BufferUtills.fullRead(channel, headBuffer);
         this.imageWidth = headBuffer.getShort();
         this.imageHeight = headBuffer.getShort();
@@ -43,10 +43,9 @@ public class ImageFrame extends Frame implements Serializable {
         }
         BufferUtills.fullRead(channel, dataBuffer);
         this.image = new ByteBuffer[]{dataBuffer};
-        return this;
     }
 
-    public ByteBuffer headBuffer() throws IOException {
+    public ByteBuffer headBuffer() {
         headBuffer.clear();
         headBuffer.putShort((short) imageWidth);
         headBuffer.putShort((short) imageHeight);
@@ -59,8 +58,7 @@ public class ImageFrame extends Frame implements Serializable {
     }
 
     public ByteBuffer dataBuffer() {
-        ByteBuffer byteBuffer = (ByteBuffer) image[0];
-        return byteBuffer;
+        return (ByteBuffer) image[0];
     }
 
 

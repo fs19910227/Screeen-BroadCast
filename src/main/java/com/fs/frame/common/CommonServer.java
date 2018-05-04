@@ -14,18 +14,6 @@ public abstract class CommonServer {
     private ServerSocketChannel serverSocketChannel;
     private Selector selector;
 
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public CommonServer() {
-    }
-
     public CommonServer(int port) {
         this.port = port;
     }

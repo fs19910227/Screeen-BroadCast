@@ -9,9 +9,7 @@ public class CaptureFactory {
     public Capture getCapture(Class<? extends Capture> clazz){
         try {
             return clazz.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return null;
