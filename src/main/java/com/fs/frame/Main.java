@@ -7,6 +7,8 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+
+
         String type = args[0];
         String host;
         Integer port;

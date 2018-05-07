@@ -1,5 +1,6 @@
 package com.fs.frame.server.ui;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -36,6 +37,7 @@ public class ServerUI extends JFrame implements ImageOberser {
 
     public ServerUI(String title, int width, int height) throws HeadlessException {
         super(title);
+
         this.setSize(width, height);
         this.setLocationRelativeTo(null);
         this.setResizable(true);       //设置窗体是否可以调整大小，参数为布尔值

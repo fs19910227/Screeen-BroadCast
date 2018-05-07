@@ -2,7 +2,8 @@ package com.fs.frame.server;
 
 
 import com.fs.frame.beans.ImageFrame;
-import com.fs.frame.common.CommonServer;
+import com.fs.frame.common.services.CommonServer;
+import com.fs.frame.common.services.ImageFrameService;
 import com.fs.frame.server.ui.ServerUI;
 import org.bytedeco.javacv.Java2DFrameConverter;
 
@@ -17,27 +18,25 @@ public class TCPServer extends CommonServer {
     private ServerUI ui;
     private Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     private Java2DFrameConverter converter = new Java2DFrameConverter();
-    private ImageFrame imageFrame;
+    private ImageFrameService frameService = new ImageFrameService();
 
 
     @Override
     protected void read(SocketChannel channel) throws IOException {
         try {
-            imageFrame.readData(channel);
+            ImageFrame imageFrame = frameService.readImageFrame(channel);
             BufferedImage image = converter.convert(imageFrame);
             ui.processImageEvent(image);
         } catch (Exception exception) {
             exception.printStackTrace();
             System.out.println("client disconnect...");
             channel.close();
-        } finally {
-            imageFrame.clear();
         }
     }
 
     public TCPServer(int port) {
         super(port);
-        imageFrame = new ImageFrame();
+
     }
 
     public TCPServer init(int width, int height) throws IOException {
@@ -54,7 +53,20 @@ public class TCPServer extends CommonServer {
 
 
     public static void main(String[] args) throws IOException {
-        TCPServer tcpServer = new TCPServer(8888).init(800,600);
+//        try
+//
+//        {
+//            //设置本属性将改变窗口边框样式定义
+//            BeautyEyeLNFHelper.frameBorderStyle = BeautyEyeLNFHelper.FrameBorderStyle.translucencySmallShadow;
+//            org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper.launchBeautyEyeLNF();
+//        }
+//        catch(Exception e)
+//        {
+//            System.out.println(e);
+//            //TODO exception
+//        }
+        TCPServer tcpServer = new TCPServer(12321).init(800,600);
+//        TCPServer tcpServer = new TCPServer(12321).init();
         tcpServer.start();
     }
 }

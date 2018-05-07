@@ -1,6 +1,10 @@
+package someTest;
+
+import com.fs.frame.beans.ImageFrame;
 import com.fs.frame.client.capture.Capture;
 import com.fs.frame.client.capture.CaptureFactory;
 import com.fs.frame.client.capture.RobotCapture;
+import com.fs.frame.common.utills.CompressUtils;
 import org.bytedeco.javacv.*;
 import org.bytedeco.javacv.Frame;
 import org.junit.After;
@@ -8,7 +12,9 @@ import org.junit.Before;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.zip.DataFormatException;
 
 
 public class Test {
@@ -35,42 +41,45 @@ public class Test {
     }
 
 
-
     @org.junit.Test
-    public void testGrabByopencv() throws IOException, ClassNotFoundException {
-        Java2DFrameConverter converter = new Java2DFrameConverter();
+    public void testGrabByopencv() throws IOException, ClassNotFoundException, DataFormatException {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        //ipl convter
+        OpenCVFrameConverter.ToIplImage iplConverter = new OpenCVFrameConverter.ToIplImage();//转换器
+        //java convter
+        Java2DFrameConverter converter = new Java2DFrameConverter();
+        OpenCVFrameConverter.ToMat matConverter = new OpenCVFrameConverter.ToMat();
 
 
-        int x = 0, y = 0, w = 1024, h = 768;
+//        int x = 0, y = 0, w = 1024, h = 768;
+        int x = 0, y = 0, w = screenSize.width, h = screenSize.height;
         FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(":0.0+" + x + "," + y);
         grabber.setFormat("x11grab");
-        grabber.setImageWidth(screenSize.width);
-        grabber.setImageHeight(screenSize.height);
+        grabber.setImageWidth(w);
+        grabber.setImageHeight(h);
+//        grabber.set
         grabber.setImageMode(FrameGrabber.ImageMode.COLOR);
-//        grabber.grabImage();
         grabber.start();
-
 
         CanvasFrame frame = new CanvasFrame("Screen RobotCapture");
 
 
 //        grabber.stop();
         while (frame.isVisible()) {
-            long start = System.currentTimeMillis();
+            start = System.currentTimeMillis();
 //            TcpPacket tcpPacket = cvCapture.captureScreen();
             Frame grab = grabber.grabImage();
-//            MyFrame myFrame = new MyFrame(new MyFrame(grab).toBytes());
-//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-//            objectOutputStream.writeObject(myFrame);
-//            System.out.println(outputStream.toByteArray().length);
 
-//            packetFrame.image=new ByteBuffer[]{tcpPacket.buffer};
-//            BufferedImage bufferedImage = converter.getBufferedImage(grab);
+            ByteBuffer imageBuffer = (ByteBuffer) grab.image[0];
+
+            ByteBuffer byteBuffer = CompressUtils.comressByteBuffer(imageBuffer);
+
+            ByteBuffer deComressByteBuffer = CompressUtils.deComressByteBuffer(byteBuffer, imageBuffer.capacity());
+
+//            ImageFrame image = new ImageFrame(grab);
+//            image.setImage(deComressByteBuffer);
             frame.showImage(grab);
-            long end = System.currentTimeMillis() - start;
-            System.out.println(end);
+            imageBuffer.clear();
         }
         frame.dispose();
         grabber.stop();
